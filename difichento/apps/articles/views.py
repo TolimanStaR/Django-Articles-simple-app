@@ -1,9 +1,12 @@
+from django.contrib.auth import login
 from django.shortcuts import render
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.urls import reverse
 
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
+from .forms import MyForm  # Моя форма для регистрации
 from .models import Article, Comment
 
 
@@ -14,6 +17,34 @@ def index(request):
 
 def test(request):
     return HttpResponse('Отображение для тестовой ссылки')
+
+
+class RegisterForm(FormView):
+    form_class = MyForm
+
+    success_url = 'articles/login/'
+
+    template_name = 'articles/register.html'
+
+    def form_valid(self, form):
+        form.save()
+        return super(RegisterForm, self).form_valid(form)
+
+
+class LoginForm(FormView):
+
+    # def __init__(self, user, **kwargs):  # Не понимаю. Без этих строк
+    #     super().__init__(**kwargs)       # PyCharm ругается, но сайт не работает
+    #     self.user = user                 # И наоборот, соответственно
+
+    form_class = AuthenticationForm
+    template_name = 'articles/login.html'
+    success_url = '/'
+
+    def form_valid(self, form):
+        self.user = form.get_user()
+        login(self.request, self.user)
+        return super(LoginForm, self).form_valid(form)
 
 
 def detail(request, article_id):

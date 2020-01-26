@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import RegisterForm, LoginForm
 
 app_name = 'articles'
 
@@ -8,5 +9,7 @@ urlpatterns = [
     path('test/', views.test, name='test'),
     path('<int:article_id>', views.detail, name='detail'),
     path('<int:article_id>/leave_comment/', views.leave_comment, name='leave_comment'),
+    path('registration/', RegisterForm.as_view(), name='register'),
+    path('login/', LoginForm.as_view(), name='login'),
 
 ]
